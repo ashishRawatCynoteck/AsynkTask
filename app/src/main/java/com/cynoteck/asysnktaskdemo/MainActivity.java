@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -21,7 +20,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity{
     RecyclerView recyclerView;
     List<ModelClass> modelClassArrayListForFirst = new ArrayList<>();
     GetPetParentResponse getPetParentResponse;
-     ModelClass modelClass = new ModelClass();
+    ModelClass modelClass = new ModelClass();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +38,8 @@ public class MainActivity extends AppCompatActivity{
 
         MyAsyncTask myAsyncTask = new MyAsyncTask();
         myAsyncTask.execute();
-
+        MyAsyncTaskTwo myAsyncTaskTwo = new MyAsyncTaskTwo();
+        myAsyncTaskTwo.execute();
 
     }
 
@@ -103,21 +102,19 @@ public class MainActivity extends AppCompatActivity{
                 getPetParentResponse = gson.fromJson(obj + "", GetPetParentResponse.class);
                 for (int position =0;position<getPetParentResponse.getData().size();position++){
                     modelClass = new ModelClass();
-                    modelClass.setEmail(getPetParentResponse.getData().get(position).getEmail());
                     modelClass.setFirstName(getPetParentResponse.getData().get(position).getFirstName());
-                    modelClass.setLastName(getPetParentResponse.getData().get(position).getLastName());
                     modelClassArrayListForFirst.add(modelClass);
                 }
 
 
-                MyAsyncTaskTwo myAsyncTaskTwo = new MyAsyncTaskTwo();
-                myAsyncTaskTwo.execute();
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
+
     public class MyAsyncTaskTwo extends AsyncTask<String,String,String> {
         @Override
         protected String doInBackground(String... strings) {
@@ -178,15 +175,21 @@ public class MainActivity extends AppCompatActivity{
                 for (int postion=0;postion<getPetParentResponse.getData().size();postion++){
                     modelClass = new ModelClass();
                     modelClass.setPhoneNumber(getPetParentResponse.getData().get(postion).getPhoneNumber());
+                    modelClass.setEmail(getPetParentResponse.getData().get(postion).getEmail());
+                    modelClass.setLastName(getPetParentResponse.getData().get(postion).getLastName());
                     for (int i=0;i<modelClassArrayListForFirst.size();i++){
                         modelClassArrayListForFirst.get(i).setPhoneNumber(getPetParentResponse.getData().get(i).getPhoneNumber());
+                        modelClassArrayListForFirst.get(i).setLastName(getPetParentResponse.getData().get(i).getLastName());
+                        modelClassArrayListForFirst.get(i).setEmail(getPetParentResponse.getData().get(i).getEmail());
+
                         Log.d("DATALOG",modelClassArrayListForFirst.get(i).getPhoneNumber());
                     }
                 }
+                Log.d("DATALOG",modelClassArrayListForFirst.toString());
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
                 recyclerView.setLayoutManager(linearLayoutManager);
-                ListAdapter listAdapter = new ListAdapter(modelClassArrayListForFirst);
+                HeadingListAdapter listAdapter = new HeadingListAdapter(modelClassArrayListForFirst);
                 recyclerView.setAdapter(listAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
