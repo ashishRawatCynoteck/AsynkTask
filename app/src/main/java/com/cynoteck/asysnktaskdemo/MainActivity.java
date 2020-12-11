@@ -1,12 +1,17 @@
 package com.cynoteck.asysnktaskdemo;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -20,26 +25,34 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity{
+
+    AppCompatSpinner spinner_SP;
     Gson gson;
     RecyclerView recyclerView;
     List<ModelClass> modelClassArrayListForFirst = new ArrayList<>();
     GetPetParentResponse getPetParentResponse;
     ModelClass modelClass = new ModelClass();
+    ArrayList<String> personList = new ArrayList<>();
+    HashMap<String,String> personHashMap=new HashMap<>();
+    String strPersonName="",getStrPersonEmail="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
+        spinner_SP = findViewById(R.id.spinner_SP);
 
         MyAsyncTask myAsyncTask = new MyAsyncTask();
         myAsyncTask.execute();
         MyAsyncTaskTwo myAsyncTaskTwo = new MyAsyncTaskTwo();
-        myAsyncTaskTwo.execute();
+//        myAsyncTaskTwo.execute();
 
     }
 
@@ -51,7 +64,7 @@ public class MainActivity extends AppCompatActivity{
                 URL url = new URL("https://petofyapi.azurewebsites.net/api/user/GetPetParentList");
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-                urlConnection.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjY2YThjY2NkLWE1ZmQtNGY1YS05NTAzLWI2OTJiNTBkZmNmMyIsIm5iZiI6MTYwNjQ2NzExMCwiZXhwIjoxNjA5MDU5MTEwLCJpYXQiOjE2MDY0NjcxMTB9.VpvzFeiMY2pWMqOwt4ulAaDOoeWwT5yK6HsRhQnDXRo");
+                urlConnection.setRequestProperty("Authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IjVkMGJkNmQ0LTIzNjQtNGU1Ny04Yzk1LTA3MzZlYTgwMDIyMSIsIm5iZiI6MTYwNzY3MzczOSwiZXhwIjoxNjEwMzUyMTM5LCJpYXQiOjE2MDc2NzM3Mzl9.yHkpAhO4kE0UY-8rcVpyTadh-64UvJUGnsPUGTVuZ_A");
                 urlConnection.setRequestMethod("POST");   //POST or GET
                 urlConnection.connect();
 
@@ -100,11 +113,19 @@ public class MainActivity extends AppCompatActivity{
                 gson = new Gson();
                 getPetParentResponse = new GetPetParentResponse();
                 getPetParentResponse = gson.fromJson(obj + "", GetPetParentResponse.class);
+                personList.add("Select Name");
                 for (int position =0;position<getPetParentResponse.getData().size();position++){
-                    modelClass = new ModelClass();
-                    modelClass.setFirstName(getPetParentResponse.getData().get(position).getFirstName());
-                    modelClassArrayListForFirst.add(modelClass);
+//                    modelClass = new ModelClass();
+//                    modelClass.setFirstName(getPetParentResponse.getData().get(position).getFirstName());
+//                    modelClass.setEmail(getPetParentResponse.getData().get(position).getEmail());
+//                    modelClassArrayListForFirst.add(modelClass);
+                    personList.add(getPetParentResponse.getData().get(position).getFirstName());
+                    personHashMap.put(getPetParentResponse.getData().get(position).getFirstName(),getPetParentResponse.getData().get(position).getEmail());
+
                 }
+                Log.e("aaa",personHashMap.toString());
+
+                setSpinnerData();
 
 
 
@@ -112,6 +133,28 @@ public class MainActivity extends AppCompatActivity{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void setSpinnerData() {
+        {
+            ArrayAdapter aa = new ArrayAdapter(this,android.R.layout.simple_spinner_item,personList);
+            aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            //Setting the ArrayAdapter data on the Spinner
+            spinner_SP.setAdapter(aa);
+            spinner_SP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String item = parent.getItemAtPosition(position).toString();
+                    strPersonName=item;
+                    Log.e("spnerType",""+strPersonName+"====>"+item);
+                    getStrPersonEmail=personHashMap.get(strPersonName);
+                    Toast.makeText(MainActivity.this, getStrPersonEmail, Toast.LENGTH_SHORT).show();
+                    Log.e("spnerType",""+getStrPersonEmail);
+
+                }
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
         }
     }
 

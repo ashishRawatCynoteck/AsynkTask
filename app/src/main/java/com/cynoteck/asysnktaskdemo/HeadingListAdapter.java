@@ -12,16 +12,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class HeadingListAdapter extends RecyclerView.Adapter<HeadingListAdapter.MyViewHolder> {
+
     List<ModelClass> modelClasses;
     RecyclerView.RecycledViewPool recycledViewPool = new RecyclerView.RecycledViewPool();
-
     public HeadingListAdapter(List<ModelClass> modelClasses) {
         this.modelClasses = modelClasses;
     }
+
 //    public ListAdapter(List<ModelClass> modelClasses, List<ModelPhone> phoneList) {
 //        this.modelClasses = modelClasses;
 //        this.phoneList = phoneList;
 //    }
+
     @NonNull
     @Override
     public HeadingListAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,7 +38,7 @@ public class HeadingListAdapter extends RecyclerView.Adapter<HeadingListAdapter.
         //firstName
         holder.firstname.setText(modelClasses.get(position).getFirstName());
 
-        //second Adapter
+//
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(holder.headingDeatilsRV.getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManager.setInitialPrefetchItemCount(modelClasses.size());
         HeadingDeatilsAdapter appointmentListAdapter = new HeadingDeatilsAdapter(modelClasses,position);
@@ -46,7 +48,7 @@ public class HeadingListAdapter extends RecyclerView.Adapter<HeadingListAdapter.
         appointmentListAdapter.notifyDataSetChanged();
 
     }
-
+    
     @Override
     public int getItemCount() {
         return modelClasses.size();
@@ -62,4 +64,5 @@ public class HeadingListAdapter extends RecyclerView.Adapter<HeadingListAdapter.
 
         }
     }
+
 }
